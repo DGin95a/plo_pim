@@ -1,0 +1,70 @@
+name: System Cache Sync
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: "Force sync all nodes immediately"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      add_name:
+        description: "(Optional) Add/Update Node Label"
+        required: false
+        default: ""
+        type: string
+      add_url:
+        description: "(Optional) Add/Update Source URL"
+        required: false
+        default: ""
+        type: string
+      add_start_gmt7:
+        description: "(Optional) Start Time GMT+7 (e.g. 23:30 or 24/24)"
+        required: false
+        default: "23:30"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup runtime
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Execute sync worker
+        env:
+          SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
+          SYNC_CHANNEL: ${{ secrets.SYNC_CHANNEL }}
+          ADD_NAME: ${{ inputs.add_name }}
+          ADD_URL: ${{ inputs.add_url }}
+          ADD_START: ${{ inputs.add_start_gmt7 }}
+        run: |
+          if [ -n "$ADD_NAME" ] && [ -n "$ADD_URL" ]; then
+            python worker.py --add "$ADD_NAME" "$ADD_URL" "${ADD_START:-23:30}"
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_sync }}" = "true" ]; then
+            python worker.py --force
+          else
+            python worker.py
+          fi
+
+      - name: Commit state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add state.json tasks.json
+          git diff --staged --quiet || git commit -m "chore: sync cache state [skip ci]"
+          git push
