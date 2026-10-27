@@ -1,0 +1,27 @@
+{
+  "tz": 7,
+  "nodes": [
+    {
+      "id": "node_01",
+      "pid": "169690",
+      "label_b64": "TGEgUHJvbWVzYQ==",
+      "src_b64": "aHR0cHM6Ly93d3cucnR2ZS5lcy9wbGF5L3ZpZGVvcy9sYS1wcm9tZXNhLw==",
+      "start_gmt7": "23:30",
+      "win_h": 4.0,
+      "days": [1, 2, 3, 4, 5, 6],
+      "ext": true,
+      "enabled": true
+    },
+    {
+      "id": "node_02",
+      "pid": "1000665",
+      "label_b64": "VmFsbGUgU2FsdmFqZQ==",
+      "src_b64": "aHR0cHM6Ly93d3cucnR2ZS5lcy9wbGF5L3ZpZGVvcy92YWxsZS1zYWx2YWplLw==",
+      "start_gmt7": "22:30",
+      "win_h": 4.0,
+      "days": [1, 2, 3, 4, 5, 6],
+      "ext": true,
+      "enabled": true
+    }
+  ]
+}
